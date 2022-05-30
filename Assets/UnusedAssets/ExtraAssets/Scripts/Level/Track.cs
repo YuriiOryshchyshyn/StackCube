@@ -56,6 +56,7 @@ public class Track : MonoBehaviour
         {
             cube = _cubes[i];
             cube.transform.SetParent(_cubesPool);
+            cube.IsInCubesWaitPool = false;
             cube.gameObject.SetActive(true);
             cube.transform.localPosition = randomPosition.SpawnPositions[currentSpawnPosition];
             cube.transform.SetParent(_cubesContainer);

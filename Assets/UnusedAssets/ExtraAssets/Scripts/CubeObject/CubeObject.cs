@@ -9,11 +9,13 @@ public class CubeObject : MonoBehaviour
     public event UnityAction<CubeObject> CubeExit;
 
     private bool _isInContainer;
+    private bool _isInCubesWaitPool;
     private bool _stackFollower;
     private Rigidbody _rigidbody;
     private Transform _cubesContainer;
 
-    public bool IsInContainer { get => _isInContainer; set => _isInContainer = value; }
+    public bool IsInPlayerContainer { get => _isInContainer; set => _isInContainer = value; }
+    public bool IsInCubesWaitPool { get => _isInCubesWaitPool; set => _isInCubesWaitPool = value; }
     public bool StackFollower { get => _stackFollower; set => _stackFollower = value; }
     public Rigidbody Rigidbody => _rigidbody;
 
@@ -24,7 +26,7 @@ public class CubeObject : MonoBehaviour
 
     private void Update()
     {
-        if (!IsInContainer)
+        if (!IsInPlayerContainer || IsInCubesWaitPool)
             return;
 
         if (Physics.BoxCast(transform.position, new Vector3(0.1f, 0.1f, 0.1f), transform.forward, out RaycastHit hitInfo, transform.rotation))
@@ -48,9 +50,10 @@ public class CubeObject : MonoBehaviour
             return;
 
         transform.SetParent(_cubesContainer);
-    }
+        _isInCubesWaitPool = true;
+}
 
-    public void Stack(Vector3 _stackPosition, Transform parent)
+public void Stack(Vector3 _stackPosition, Transform parent)
     {
         _isInContainer = true;
         transform.SetParent(parent);
@@ -61,7 +64,7 @@ public class CubeObject : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent(out CubeObject cube))
         {
-            if (cube.IsInContainer)
+            if (cube.IsInPlayerContainer || _isInCubesWaitPool)
                 return;
 
             CubeEnter?.Invoke(cube);
